@@ -1,8 +1,13 @@
-import { Button, Text, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Stack } from 'expo-router'
+import { Link, Stack } from "expo-router"
+import { Plus } from "lucide-react-native"
+import { Button, Pressable, Text, View } from "react-native"
+import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet"
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet"
 
-import { api } from '~/utils/api'
+import { api } from "~/utils/api"
+import { useCallback, useMemo, useRef } from "react"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
 export default function Index() {
   const bottomSheetRef = useRef<BottomSheet>(null)
