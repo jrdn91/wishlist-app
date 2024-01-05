@@ -29,6 +29,7 @@
     "expo-router": "2.0.14",
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
+    "lodash": "^4.17.21",
     "lucide-react-native": "^0.306.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -51,6 +52,7 @@
     "@repo/eslint-config": "*",
     "@repo/tsconfig": "*",
     "@types/babel__core": "^7.20.4",
+    "@types/lodash": "^4.14.202",
     "@types/react": "^18.2.46",
     "eslint": "^8.56.0",
     "typescript": "^5.3.3"
