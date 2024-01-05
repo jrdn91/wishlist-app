@@ -1,6 +1,6 @@
-import { prisma } from '../prisma'
-import { createRouter, publicProcedure } from '../trpc'
-import * as z from 'zod'
+import { prisma } from "../prisma"
+import { createRouter, publicProcedure } from "../trpc"
+import * as z from "zod"
 
 export const wishlists = createRouter({
   createWishlist: publicProcedure
@@ -35,6 +35,11 @@ export const wishlists = createRouter({
         },
         where: {
           userId: ctx.user.id,
+        },
+        orderBy: {
+          wishlist: {
+            created: "asc",
+          },
         },
       })
     ).map(({ wishlist }) => wishlist)
