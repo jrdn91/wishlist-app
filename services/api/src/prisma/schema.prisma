@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+
+  username String
+  created  DateTime @default(now())
+  updated  DateTime @updatedAt
+
+  wishlists UsersToWishlists[]
+
+  @@map("users")
+}
+
+model UsersToWishlists {
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String   @map("user_id")
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id])
+  wishlistId String   @map("wishlist_id")
+
+  @@id([userId, wishlistId])
+  @@map("users_to_wishlists")
+}
+
+model Wishlist {
+  id String @id @default(uuid())
+
+  name    String
+  created DateTime  @default(now())
+  updated DateTime? // updated elswhere when things are done within the wishlist
+
+  users         UsersToWishlists[]
+  creatorUserId String             @map("creator_user_id")
+
+  wishlistItems WishlistItem[]
+
+  @@map("wishlists")
+}
+
+model WishlistItem {
+  id String @id @default(uuid())
+
+  name String
+  url  String @db.VarChar(1000)
+
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id])
+  wishlistId String   @map("wishlist_id")
+
+  @@map("wishlist_items")
+}
