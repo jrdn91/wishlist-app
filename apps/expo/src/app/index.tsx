@@ -6,8 +6,18 @@ import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet"
 
 import { api } from "~/utils/api"
 import { useCallback, useMemo, useRef } from "react"
+import type { SubmitErrorHandler, SubmitHandler } from "react-hook-form"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import ControlledTextField from "~/forms/ControlledTextField"
+import { orderBy } from "lodash"
+
+const newListSchema = z.object({
+  name: z.string().min(1).max(191),
+})
+
+type FormValues = z.infer<typeof newListSchema>
 
 export default function Index() {
   const bottomSheetRef = useRef<BottomSheet>(null)
@@ -16,17 +26,14 @@ export default function Index() {
 
   const utils = api.useUtils()
   const { data: wishlists, isLoading } = api.listWishlists.useQuery()
-  const { mutate } = api.createWishlist.useMutation({
+  const { mutate: createWishList } = api.createWishlist.useMutation({
     onSuccess(data) {
-      utils.listWishlists.setData(undefined, (prev) => [...(prev ?? []), data])
+      utils.listWishlists.setData(undefined, (prev) =>
+        orderBy([...(prev ?? []), data], ["created"], ["asc"]),
+      )
+      bottomSheetRef.current?.close()
     },
   })
-
-  const handleCreateWishlist = () => {
-    mutate({
-      name: `New Wishlist ${Math.random()}`,
-    })
-  }
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -39,7 +46,18 @@ export default function Index() {
     [],
   )
 
-  const newListForm = useForm({})
+  const newListForm = useForm({
+    resolver: zodResolver(newListSchema),
+    defaultValues: {
+      name: "",
+    },
+  })
+
+  const onSubmit: SubmitHandler<FormValues> = (values) => {
+    createWishList(values)
+  }
+
+  const onErrors: SubmitErrorHandler<FormValues> = (errors) => {}
 
   return (
     <View style={{ flex: 1 }}>
@@ -49,7 +67,7 @@ export default function Index() {
           headerRight: () => (
             <Pressable
               onPress={() => bottomSheetRef.current?.expand()}
-              style={{ flexDirection: "row", alignItems: "center" }}
+              style={{ flexDirection: "row", justifyContent: "center" }}
             >
               <Plus color="#000" size={16} style={{ marginTop: -2 }} />
               <Text>Add List</Text>
@@ -58,7 +76,6 @@ export default function Index() {
         }}
       />
       <View>
-        <Button title="Create Wishlist" onPress={handleCreateWishlist} />
         {isLoading && <Text>Loading...</Text>}
         {wishlists?.map((wishlist) => (
           <Text key={wishlist.id}>{wishlist.name}</Text>
@@ -70,9 +87,19 @@ export default function Index() {
         enablePanDownToClose
         snapPoints={snapPoints}
         backdropComponent={renderBackdrop}
+        onClose={() => newListForm.reset()}
       >
-        <View style={{ flex: 1, alignItems: "center" }}>
-          <Text style={{ fontSize: 18 }}>New List</Text>
+        <View style={{ alignItems: "center", padding: 20 }}>
+          <Text style={{ fontSize: 18, marginBottom: 20 }}>New List</Text>
+          <ControlledTextField
+            control={newListForm.control}
+            name="name"
+            style={{ width: "100%" }}
+          />
+          <Button
+            onPress={newListForm.handleSubmit(onSubmit, onErrors)}
+            title="Create List"
+          />
         </View>
       </BottomSheet>
     </View>
