@@ -1,13 +1,13 @@
-import { initTRPC } from '@trpc/server'
-import type { CreateFastifyContextOptions } from '@trpc/server/adapters/fastify'
-import superjson from 'superjson'
+import { initTRPC } from "@trpc/server"
+import type { CreateFastifyContextOptions } from "@trpc/server/adapters/fastify"
+import superjson from "superjson"
 
 // const t = initTRPC.create({
 //   transformer: superjson,
 // })
 
 export function createContext({ req, res }: CreateFastifyContextOptions) {
-  const user = { id: 'fbbbb321-eb88-4fc6-9258-f3d71ff328c9' }
+  const user = { id: "fbbbb321-eb88-4fc6-9258-f3d71ff328c9" }
   return {
     req,
     res,

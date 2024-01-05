@@ -1,8 +1,8 @@
-import { mergeRouters } from './src/trpc'
+import { mergeRouters } from "./src/trpc"
 
-import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 
-import { wishlists } from './src/routers/wishlists'
+import { wishlists } from "./src/routers/wishlists"
 
 export const appRouter = mergeRouters(wishlists)
 
