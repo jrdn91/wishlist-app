@@ -1,6 +1,6 @@
-import { Link, Stack } from "expo-router"
+import { Link, Stack, router } from "expo-router"
 import { Plus } from "lucide-react-native"
-import { Button, Pressable, Text, View } from "react-native"
+import { Button, Pressable, ScrollView, Text, View } from "react-native"
 import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet"
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet"
 
@@ -22,7 +22,7 @@ type FormValues = z.infer<typeof newListSchema>
 export default function Index() {
   const bottomSheetRef = useRef<BottomSheet>(null)
 
-  const snapPoints = useMemo(() => ["25%"], [])
+  const snapPoints = useMemo(() => ["25%", "100%"], [])
 
   const utils = api.useUtils()
   const { data: wishlists, isLoading } = api.listWishlists.useQuery()
@@ -66,28 +66,49 @@ export default function Index() {
           title: "",
           headerRight: () => (
             <Pressable
-              onPress={() => bottomSheetRef.current?.expand()}
+              onPress={() => bottomSheetRef.current?.snapToIndex(0)}
               style={{ flexDirection: "row", justifyContent: "center" }}
             >
-              <Plus color="#000" size={16} style={{ marginTop: -2 }} />
+              <Plus color="#000" size={16} style={{ marginRight: 6 }} />
               <Text>Add List</Text>
             </Pressable>
           ),
         }}
       />
-      <View>
+      <ScrollView>
         {isLoading && <Text>Loading...</Text>}
-        {wishlists?.map((wishlist) => (
-          <Text key={wishlist.id}>{wishlist.name}</Text>
-        ))}
-      </View>
+        <View
+          style={{
+            flexWrap: "wrap",
+            flexDirection: "row",
+            justifyContent: "space-around",
+            paddingVertical: 20,
+          }}
+        >
+          {wishlists?.map((wishlist) => (
+            <Pressable
+              key={wishlist.id}
+              onPress={() => router.push(`/${wishlist.id}`)}
+              style={{
+                height: 200,
+                width: "40%",
+                borderWidth: 1,
+                borderColor: "#000",
+                marginBottom: 20,
+              }}
+            >
+              <Text>{wishlist.name}</Text>
+            </Pressable>
+          ))}
+        </View>
+      </ScrollView>
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
-        enablePanDownToClose
         snapPoints={snapPoints}
         backdropComponent={renderBackdrop}
         onClose={() => newListForm.reset()}
+        enableHandlePanningGesture={false}
       >
         <View style={{ alignItems: "center", padding: 20 }}>
           <Text style={{ fontSize: 18, marginBottom: 20 }}>New List</Text>
@@ -95,6 +116,8 @@ export default function Index() {
             control={newListForm.control}
             name="name"
             style={{ width: "100%" }}
+            onFocus={() => bottomSheetRef.current?.snapToIndex(1)}
+            onBlur={() => bottomSheetRef.current?.snapToIndex(0)}
           />
           <Button
             onPress={newListForm.handleSubmit(onSubmit, onErrors)}

@@ -45,4 +45,14 @@ export const wishlists = createRouter({
     ).map(({ wishlist }) => wishlist)
     return wishlistsForUser
   }),
+  getWishlistById: publicProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      const wishlist = await prisma.wishlist.findUnique({
+        where: {
+          id: input,
+        },
+      })
+      return wishlist
+    }),
 })
