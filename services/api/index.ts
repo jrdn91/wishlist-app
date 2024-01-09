@@ -3,8 +3,9 @@ import { mergeRouters } from "./src/trpc"
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 
 import { wishlists } from "./src/routers/wishlists"
+import { items } from "./src/routers/items"
 
-export const appRouter = mergeRouters(wishlists)
+export const appRouter = mergeRouters(wishlists, items)
 
 /**
  * Inference helpers for input types
